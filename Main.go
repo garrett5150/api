@@ -15,15 +15,6 @@ type event struct {
 	Description string `json:"description"`
 }
 
-type error interface {
-	Error() string
-}
-
-/*var standardError = log.WithFields(log.Fields{
-"description": "",
-"Error":       "",
-})*/
-
 func main() {
 	//updates the log file to the current date
 	CurrentTime := time.Now().Format("01-02-2006")
