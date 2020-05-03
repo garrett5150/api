@@ -21,9 +21,6 @@ type ApiKey struct {
 	ApiKey string `json:"apikey"`
 }
 
-//TODO Incorrect incoming request such as http://localhost:8080/AlphaVantage/STS/MonthlyAdjustedasdsadasdsadasda breaks horribly rather than returning a 400 error
-//TODO might be a int related issue
-
 var AlphaVantageURL = "https://www.alphavantage.co/query?"
 
 func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
@@ -41,12 +38,14 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("Failed to read Body. ", err)
 		returnError(w, "The server could not understand the request due to invalid syntax", 400)
+		return
 	}
 	//Assigns JSON Request to the Stock Structure
 	err = json.Unmarshal(body, &Stock)
 	if err != nil {
 		log.Error("Failed Load Data to Stock Struct. ", err)
 		returnError(w, "The server could not understand the request due to invalid syntax", 400)
+		return
 	}
 	//Log the info we received
 	log.WithFields(log.Fields{"Info Received": &Stock}).Info()
@@ -56,12 +55,14 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("Failed to read ApiKey File. ", err)
 		returnError(w, "The service is currently unavailable", 502)
+		return
 	}
 	//Assigns the API key to the struct
 	err = json.Unmarshal(file, &key)
 	if err != nil {
 		log.Error("Failed Load API Key to Struct. ", err)
 		returnError(w, "The service is currently unavailable", 503)
+		return
 	}
 
 	//If no errors occur, check if the required fields are present
@@ -75,6 +76,7 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 			} else {
 				log.Error("Interval not Set, cannot send query.")
 				returnError(w, "The service encountered an error returning the data", 400)
+				return
 			}
 		case "Daily":
 			query = TimeSeriesDaily(Stock, key)
@@ -96,6 +98,7 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 			{
 				log.Error("Unknown switch function call")
 				returnError(w, function+" is an unknown value for STS calls", 400)
+				return
 			}
 		}
 
@@ -104,6 +107,7 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Error("Error from AlphaVantage API", err)
 			returnError(w, "The service encountered an error calling the AlphaVantage API", 502)
+			return
 		}
 
 		defer resp.Body.Close()
@@ -112,6 +116,7 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Error("Failed to read AlphaVantage API Response")
 			returnError(w, "The service encountered an error reading the AlphaVantage API Response", 500)
+			return
 		}
 
 		//Assigns the API key to the struct
@@ -119,11 +124,13 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Error("Failed Load API Key to Struct. ", err)
 			returnError(w, "The service is currently unavailable", 500)
+			return
 		}
 
 	} else {
 		log.Error("Symbol not Set, cannot send query.")
 		returnError(w, "The service encountered an error returning the data", 400)
+		return
 	}
 
 	//Prep Data to be sent back to requester
@@ -131,6 +138,7 @@ func StockTimeSeries(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("Failed to Prepare data for send back. ", err)
 		returnError(w, "The service encountered an error returning the data", 500)
+		return
 	}
 
 	//Set Content-type & Status to client can read the response

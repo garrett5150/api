@@ -9,9 +9,6 @@ type Error struct {
 	Error string `json:"error"`
 }
 
-//TODO Incorrect incoming request such as http://localhost:8080/AlphaVantage/STS/MonthlyAdjustedasdsadasdsadasda breaks horribly rather than returning a 400 error
-//TODO might be a int related issue
-
 //Generic error function that returns an error code, and attached string
 func returnError(w http.ResponseWriter, message string, status int) {
 	var GenericError Error
