@@ -9,12 +9,13 @@ type Error struct {
 	Error string `json:"error"`
 }
 
-func returnError(w http.ResponseWriter, message string) {
+//Generic error function that returns an error code, and attached string
+func returnError(w http.ResponseWriter, message string, status int) {
 	var GenericError Error
 
 	//Set Content-type & Status to client can read the response
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(status)
 	//Prep Error to be sent back to requester
 	GenericError.Error = message
 	resErr, _ := json.Marshal(GenericError)

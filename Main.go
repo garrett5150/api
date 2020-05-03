@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -46,18 +45,4 @@ func init() {
 	//Sets the log to TraceLevel severity and above while building the app
 	log.SetLevel(log.TraceLevel)
 	//opens a log file to track issues, if file doesnt exist, create it.
-}
-
-//test Route functions
-func homeLink(w http.ResponseWriter, r *http.Request) {
-	log.Info("homeLink Called")
-	fmt.Fprintf(w, "Welcome Home!")
-}
-func test1(w http.ResponseWriter, r *http.Request) {
-	log.Info("Test 1 Called")
-	fmt.Fprintf(w, "Test1!")
-}
-func test2(w http.ResponseWriter, r *http.Request) {
-	log.Info("Test 2 Called")
-	fmt.Fprintf(w, "Test2!")
 }
